@@ -2,9 +2,20 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var store = FareStore()
-    @State private var selectedRuleIndex = 0
+    @State private var selectedRuleIndex = ContentView.defaultIndex
     @State private var distanceInput: String = ""
     @FocusState private var isInputFocused: Bool
+
+    static var defaultIndex: Int {
+        let hour = Calendar.current.component(.hour, from: Date())
+        if hour >= 10 && hour < 19 {
+            return 0 // 10:00 - 18:59 -> 19点前
+        } else if hour >= 19 {
+            return 1 // 19:00 - 23:59 -> 24点前
+        } else {
+            return 2 // 00:00 - 09:59 -> 24点后
+        }
+    }
 
     var calculatedPrice: Double {
         guard let distance = Double(distanceInput),
