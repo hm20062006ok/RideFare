@@ -18,10 +18,11 @@ struct ContentView: View {
     }
 
     var calculatedPrice: Double {
-        guard let distance = Double(distanceInput),
+        guard let inputDistance = Double(distanceInput),
               store.rules.indices.contains(selectedRuleIndex) else {
             return 0.0
         }
+        let distance = ceil(inputDistance)
         let rule = store.rules[selectedRuleIndex]
         
         // 价格计算逻辑：
