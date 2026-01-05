@@ -15,21 +15,21 @@ class FareStore: ObservableObject {
     @Published var rules: [FareRule] {
         didSet {
             if let encoded = try? JSONEncoder().encode(rules) {
-                UserDefaults.standard.set(encoded, forKey: "FareRules")
+                UserDefaults.standard.set(encoded, forKey: "FareRules_v2")
             }
         }
     }
 
     init() {
-        if let data = UserDefaults.standard.data(forKey: "FareRules"),
+        if let data = UserDefaults.standard.data(forKey: "FareRules_v2"),
            let decoded = try? JSONDecoder().decode([FareRule].self, from: data) {
             self.rules = decoded
         } else {
             // 默认初始设置
             self.rules = [
-                FareRule(id: "before19", name: "19点前", baseFare: 20, baseDistance: 5, unitPrice: 3, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
-                FareRule(id: "before24", name: "24点前", baseFare: 25, baseDistance: 5, unitPrice: 3.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
-                FareRule(id: "after24", name: "24点后", baseFare: 30, baseDistance: 5, unitPrice: 4, longDistanceThreshold: 30, longDistanceSurcharge: 0.8, longDistanceCap: 160)
+                FareRule(id: "day", name: "07:00-19:59", baseFare: 22, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
+                FareRule(id: "evening", name: "20:00-23:59", baseFare: 25, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
+                FareRule(id: "night", name: "00:00-06:59", baseFare: 39, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160)
             ]
         }
     }
