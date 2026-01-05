@@ -27,9 +27,9 @@ class FareStore: ObservableObject {
         } else {
             // 默认初始设置
             self.rules = [
-                FareRule(id: "day", name: "07:00-19:59", baseFare: 22, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
-                FareRule(id: "evening", name: "20:00-23:59", baseFare: 25, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160),
-                FareRule(id: "night", name: "00:00-06:59", baseFare: 39, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 0, longDistanceCap: 160)
+                FareRule(id: "day", name: "07:00-19:59", baseFare: 22, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 1, longDistanceCap: 200),
+                FareRule(id: "evening", name: "20:00-23:59", baseFare: 25, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 1, longDistanceCap: 200),
+                FareRule(id: "night", name: "00:00-06:59", baseFare: 39, baseDistance: 5, unitPrice: 4.5, longDistanceThreshold: 30, longDistanceSurcharge: 1, longDistanceCap: 200)
             ]
         }
     }

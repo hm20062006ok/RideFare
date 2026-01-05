@@ -5,6 +5,7 @@ struct ContentView: View {
     @State private var selectedRuleIndex = ContentView.defaultIndex
     @State private var distanceInput: String = ""
     @FocusState private var isInputFocused: Bool
+    @State private var showDetails: Bool = false
 
     static var defaultIndex: Int {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -17,10 +18,10 @@ struct ContentView: View {
         }
     }
 
-    var calculatedPrice: Double {
+    private func calculateDetails() -> (total: Double, distance: Double, distanceCost: Double, longDistanceCost: Double, rule: FareRule)? {
         guard let inputDistance = Double(distanceInput),
               store.rules.indices.contains(selectedRuleIndex) else {
-            return 0.0
+            return nil
         }
         let distance = ceil(inputDistance)
         let rule = store.rules[selectedRuleIndex]
@@ -35,7 +36,11 @@ struct ContentView: View {
         let rawLongDistanceCost = max(0, distance - rule.longDistanceThreshold) * rule.longDistanceSurcharge
         let longDistanceCost = min(rawLongDistanceCost, rule.longDistanceCap)
         
-        return base + distanceCost + longDistanceCost
+        return (base + distanceCost + longDistanceCost, distance, distanceCost, longDistanceCost, rule)
+    }
+
+    var calculatedPrice: Double {
+        calculateDetails()?.total ?? 0.0
     }
 
     var body: some View {
@@ -72,6 +77,46 @@ struct ContentView: View {
                     Text("¥\(String(format: "%.2f", calculatedPrice))")
                         .font(.system(size: 60, weight: .bold))
                         .foregroundColor(.blue)
+                    
+                    if calculatedPrice > 0 {
+                        Button(action: { withAnimation { showDetails.toggle() } }) {
+                            HStack {
+                                Text(showDetails ? "收起明细" : "查看明细")
+                                Image(systemName: "chevron.right")
+                                    .rotationEffect(.degrees(showDetails ? 90 : 0))
+                            }
+                            .font(.subheadline)
+                        }
+                        
+                        if showDetails, let details = calculateDetails() {
+                            VStack(spacing: 8) {
+                                HStack {
+                                    Text("起步价 (含\(Int(details.rule.baseDistance))公里)")
+                                    Spacer()
+                                    Text("¥\(String(format: "%.2f", details.rule.baseFare))")
+                                }
+                                HStack {
+                                    let extraDistance = max(0, details.distance - details.rule.baseDistance)
+                                    Text("里程费 (\(String(format: "%.0f", extraDistance))公里 * \(String(format: "%.2f", details.rule.unitPrice))元)")
+                                    Spacer()
+                                    Text("¥\(String(format: "%.2f", details.distanceCost))")
+                                }
+                                if details.longDistanceCost > 0 || details.distance > details.rule.longDistanceThreshold {
+                                    HStack {
+                                        let longDistance = max(0, details.distance - details.rule.longDistanceThreshold)
+                                        Text("远途费 (\(String(format: "%.0f", longDistance))公里 * \(String(format: "%.2f", details.rule.longDistanceSurcharge))元)")
+                                        Spacer()
+                                        Text("¥\(String(format: "%.2f", details.longDistanceCost))")
+                                    }
+                                }
+                            }
+                            .font(.caption)
+                            .padding()
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                            .padding(.horizontal)
+                        }
+                    }
                 }
                 .padding(.top, 20)
 
