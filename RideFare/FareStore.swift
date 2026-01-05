@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct FareRule: Identifiable, Codable {
     var id: String
@@ -19,8 +20,17 @@ class FareStore: ObservableObject {
             }
         }
     }
+    
+    @Published var discount: Double {
+        didSet {
+            UserDefaults.standard.set(discount, forKey: "FareDiscount")
+        }
+    }
 
     init() {
+        let savedDiscount = UserDefaults.standard.double(forKey: "FareDiscount")
+        self.discount = savedDiscount == 0 ? 1.0 : savedDiscount
+        
         if let data = UserDefaults.standard.data(forKey: "FareRules_v2"),
            let decoded = try? JSONDecoder().decode([FareRule].self, from: data) {
             self.rules = decoded

@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var distanceInput: String = ""
     @FocusState private var isInputFocused: Bool
     @State private var showDetails: Bool = false
+    @State private var isDiscounted: Bool = false
 
     static var defaultIndex: Int {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -40,7 +41,8 @@ struct ContentView: View {
     }
 
     var calculatedPrice: Double {
-        calculateDetails()?.total ?? 0.0
+        let total = calculateDetails()?.total ?? 0.0
+        return isDiscounted ? total * store.discount : total
     }
 
     var body: some View {
@@ -60,11 +62,23 @@ struct ContentView: View {
                     Text("行驶里程 (公里)")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    TextField("请输入公里数", text: $distanceInput)
-                        .keyboardType(.decimalPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .focused($isInputFocused)
-                        .font(.title)
+                    HStack {
+                        TextField("请输入公里数", text: $distanceInput)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .focused($isInputFocused)
+                            .font(.title)
+                        
+                        Button(action: { isDiscounted.toggle() }) {
+                            Text(isDiscounted ? "Cancel" : "Discount")
+                                .font(.subheadline)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(isDiscounted ? Color.orange : Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
                 }
                 .padding(.horizontal)
 
